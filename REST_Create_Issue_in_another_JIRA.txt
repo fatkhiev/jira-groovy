@@ -1,0 +1,39 @@
+import groovyx.net.http.RESTClient
+import org.apache.http.HttpRequest
+import org.apache.http.HttpRequestInterceptor
+import com.atlassian.jira.component.ComponentAccessor
+import groovyx.net.http.RESTClient;
+import groovyx.net.http.HttpResponseDecorator;
+import org.apache.http.HttpRequest;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.HttpRequestInterceptor;
+import static groovyx.net.http.Method.*
+import groovy.json.*
+import static groovyx.net.http.ContentType.*
+
+constantsManager = ComponentAccessor.getConstantsManager()
+
+ 
+def RESTClient http
+def baseUrl = "http://jira:8080/jira/"
+http = new RESTClient(baseUrl)
+http.client.addRequestInterceptor(new HttpRequestInterceptor() {
+    void process(HttpRequest httpRequest,HttpContext httpContext) {
+        httpRequest.addHeader('Authorization', 'Basic ' + 'admin:pass'.bytes.encodeBase64().toString())
+    }
+})
+ 
+def issue = http.request(POST, JSON) {
+    uri.path = '/rest/api/2/issue'
+    body = [
+            "fields": [
+            "project": [
+                "id": "15305"
+            ],
+            "summary": "No REST for the Wicked.",
+            "issuetype": [
+                "id": "10900"
+            ]
+        ]
+    ]
+}

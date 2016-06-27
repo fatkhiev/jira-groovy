@@ -1,0 +1,56 @@
+import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.security.roles.ProjectRoleManager
+import com.atlassian.jira.issue.security.IssueSecurityLevelManager 
+import com.atlassian.jira.issue.security.IssueSecuritySchemeManager
+import com.atlassian.jira.ManagerFactory 
+import com.atlassian.jira.util.ImportUtils
+import com.atlassian.jira.issue.worklog.WorklogImpl
+import com.atlassian.jira.ComponentManager
+import com.atlassian.jira.issue.MutableIssue
+import com.atlassian.jira.issue.Issue
+import com.atlassian.jira.user.util.UserManager
+import com.atlassian.jira.event.issue.AbstractIssueEventListener
+import com.atlassian.jira.event.issue.IssueEvent
+import org.apache.log4j.Category
+import com.atlassian.jira.issue.managers.DefaultIssueManager
+import com.atlassian.jira.issue.worklog.DefaultWorklogManager
+import com.atlassian.jira.issue.IssueImpl
+import com.atlassian.jira.issue.issuetype.IssueTypeImpl
+import com.atlassian.jira.issue.worklog.WorklogManager
+import com.atlassian.jira.issue.link.IssueLink
+import com.atlassian.jira.issue.link.IssueLinkTypeManager
+import com.atlassian.jira.issue.link.IssueLinkManager
+import com.atlassian.jira.issue.link.LinkCollection
+import com.atlassian.crowd.embedded.api.User
+import com.atlassian.jira.issue.comments.CommentManager
+
+	
+ComponentManager componentManager = ComponentManager.getInstance()
+DefaultIssueManager issueManager = ComponentAccessor.getIssueManager()
+DefaultWorklogManager worklogManager = ComponentAccessor.getWorklogManager()
+UserManager userManager = ComponentAccessor.getUserManager()
+issueManager = ComponentAccessor.getIssueManager()
+IssueLinkManager linkManager = ComponentAccessor.getIssueLinkManager()
+CommentManager commentManager = ComponentAccessor.getCommentManager()
+issue = issueManager.getIssueObject('test-148')
+newIssue = issueManager.getIssueObject('test-147')
+	
+def user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser().name
+User currentUser = userManager.getUserObject(user)
+	
+	
+def summary = issue.getSummary()
+
+ArrayList worklogs = ComponentManager.instance.worklogManager.getByIssue(issue)
+
+for (wlg in worklogs) {
+    def time = wlg.getTimeSpent() 
+    def date = wlg.getStartDate()
+    def comment = wlg.getComment()
+    def username = wlg.getAuthor()	
+   if (comment == "test") {
+    	WorklogImpl wli = new WorklogImpl(null, newIssue, 0, username, comment, date, null, null, time)
+    	ComponentManager.instance.worklogManager.create(currentUser, wli, 0, false)
+    	ComponentManager.instance.worklogManager.delete(currentUser, wlg, 0, false)
+        }
+   }
