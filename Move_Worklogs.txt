@@ -24,7 +24,7 @@ import com.atlassian.jira.issue.link.LinkCollection
 import com.atlassian.crowd.embedded.api.User
 import com.atlassian.jira.issue.comments.CommentManager
 
-	
+//	
 ComponentManager componentManager = ComponentManager.getInstance()
 DefaultIssueManager issueManager = ComponentAccessor.getIssueManager()
 DefaultWorklogManager worklogManager = ComponentAccessor.getWorklogManager()
